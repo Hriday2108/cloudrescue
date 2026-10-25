@@ -60,13 +60,8 @@ app.use((req, res) => {
 // Centralized error handler
 app.use(errorHandler);
 
-// Start server only when executed directly as entrypoint, not when imported by test runner
-const isDirectRun = process.argv[1] && (
-  process.argv[1].endsWith('server.js') || 
-  process.argv[1].endsWith('server')
-);
-
-if (isDirectRun && process.env.NODE_ENV !== 'test') {
+// Start server whenever not running under automated tests (compatible with node and pm2)
+if (process.env.NODE_ENV !== 'test') {
   const HOST = '0.0.0.0';
   const server = app.listen(config.port, HOST, () => {
 
