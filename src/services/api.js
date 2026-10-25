@@ -4,7 +4,16 @@
 // Reads backend URL from VITE_API_BASE_URL (defaults to http://localhost:5000/api)
 // ==============================================================
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+// Automatically use current host (e.g. 18.212.207.167 or localhost) on port 5000
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  if (typeof window !== 'undefined' && window.location.hostname) {
+    return `${window.location.protocol}//${window.location.hostname}:5000/api`;
+  }
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE = getApiBase();
 
 class ApiClient {
   constructor(baseUrl) {
