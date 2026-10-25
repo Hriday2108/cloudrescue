@@ -67,7 +67,8 @@ const isDirectRun = process.argv[1] && (
 );
 
 if (isDirectRun && process.env.NODE_ENV !== 'test') {
-  const server = app.listen(config.port, () => {
+  const HOST = '0.0.0.0';
+  const server = app.listen(config.port, HOST, () => {
 
     console.log(`\n=================================================`);
     console.log(`  CloudRescue API Server running on port ${config.port}`);
