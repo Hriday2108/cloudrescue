@@ -13,11 +13,19 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
-// CORS configuration - only allow explicit frontend origins
+// CORS configuration - allow explicit frontend origins, wildcard, or any client on port 5173
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow non-browser requests (e.g. curl, tests, postman) or matching frontend origins
-    if (!origin || config.frontendOrigins.includes(origin)) {
+    // Allow non-browser requests (e.g. curl, tests, postman)
+    if (!origin) return callback(null, true);
+    
+    // Allow wildcard or explicit matches
+    if (
+      config.frontendOrigins.includes('*') ||
+      config.frontendOrigins.includes(origin) ||
+      origin.includes(':5173') ||
+      origin.includes('localhost')
+    ) {
       return callback(null, true);
     }
     return callback(new Error(`Origin '${origin}' not allowed by CORS`));
