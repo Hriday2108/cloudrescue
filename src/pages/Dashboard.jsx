@@ -57,9 +57,20 @@ export default function Dashboard() {
   const successCount = backups.filter(b => b.status === 'success').length;
   const failedCount = backups.filter(b => b.status === 'error').length;
   const totalBytes = backups.reduce((s, b) => s + b.size, 0);
-  const storageGB = (totalBytes / 1024 ** 3).toFixed(1);
-  const storageMax = 50;
-  const storagePct = ((storageGB / storageMax) * 100).toFixed(0);
+  const storageMaxGB = 50;
+  const storageMaxBytes = storageMaxGB * 1024 ** 3;
+
+  // Smart unit formatter: picks the best unit for the given byte count
+  const formatBytes = (bytes) => {
+    if (bytes === 0) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+    const value = bytes / 1024 ** i;
+    return `${value < 10 ? value.toFixed(2) : value < 100 ? value.toFixed(1) : Math.round(value)} ${units[i]}`;
+  };
+
+  const storageLabel = formatBytes(totalBytes);
+  const storagePct = ((totalBytes / storageMaxBytes) * 100).toFixed(0);
 
   const recentBackups = [...backups].slice(0, 5);
 
@@ -90,8 +101,8 @@ export default function Dashboard() {
             trend="up" trendLabel="7 this week" />
         </div>
         <div role="listitem">
-          <StatCard label="Storage Used" value={`${storageGB} GB`} icon={HardDrive} iconClass="purple"
-            trend="up" trendLabel={`${storagePct}% of 50 GB`} />
+          <StatCard label="Storage Used" value={storageLabel} icon={HardDrive} iconClass="purple"
+            trend="up" trendLabel={`${storagePct}% of ${storageMaxGB} GB`} />
         </div>
         <div role="listitem">
           <StatCard label="Successful" value={successCount} icon={CheckCircle2} iconClass="green"
